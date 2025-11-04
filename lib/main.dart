@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class Product {
-  Product({required this.name});
+  Product({required this.name, this.quantity = 1});
 
   final String name;
+  int quantity;
 
   @override
   bool operator ==(Object other) =>
@@ -17,17 +19,20 @@ class Product {
 }
 
 typedef CartChangedCallback = void Function(Product product, bool inCart);
+typedef QuantityChangedCallback = void Function(Product product, int quantity);
 
 class ShoppingListItem extends StatelessWidget {
   ShoppingListItem({
     required this.product,
     required this.inCart,
     required this.onCartChanged,
+    required this.onQuantityChanged,
   }) : super(key: ObjectKey(product));
 
   final Product product;
   final bool inCart;
   final CartChangedCallback onCartChanged;
+  final QuantityChangedCallback onQuantityChanged;
 
   Color _getColor(BuildContext context) {
     // The theme depends on the BuildContext because different
@@ -51,6 +56,9 @@ class ShoppingListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final quantityController =
+        TextEditingController(text: product.quantity.toString());
+
     return ListTile(
       onTap: () {
         onCartChanged(product, !inCart);
@@ -69,9 +77,59 @@ class ShoppingListItem extends StatelessWidget {
         product.name,
         style: _getTextStyle(context),
       ),
-      trailing: inCart
-          ? const Icon(Icons.check_circle, color: Colors.green)
-          : const Icon(Icons.radio_button_unchecked, color: Colors.grey),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Minus button
+          IconButton(
+            icon: const Icon(Icons.remove_circle_outline),
+            onPressed: () {
+              if (product.quantity > 0) {
+                onQuantityChanged(product, product.quantity - 1);
+              }
+            },
+            iconSize: 24,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+          ),
+          const SizedBox(width: 8),
+          // Quantity text field
+          SizedBox(
+            width: 50,
+            child: TextField(
+              controller: quantityController,
+              keyboardType: TextInputType.number,
+              textAlign: TextAlign.center,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              ),
+              onSubmitted: (value) {
+                final newQuantity = int.tryParse(value) ?? 1;
+                onQuantityChanged(product, newQuantity);
+              },
+            ),
+          ),
+          const SizedBox(width: 8),
+          // Plus button
+          IconButton(
+            icon: const Icon(Icons.add_circle_outline),
+            onPressed: () {
+              onQuantityChanged(product, product.quantity + 1);
+            },
+            iconSize: 24,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+          ),
+          const SizedBox(width: 8),
+          // Cart checkbox
+          inCart
+              ? const Icon(Icons.check_circle, color: Colors.green)
+              : const Icon(Icons.radio_button_unchecked, color: Colors.grey),
+        ],
+      ),
     );
   }
 }
@@ -104,6 +162,18 @@ class _ShoppingListState extends State<ShoppingList> {
         _shoppingCart.add(product);
       } else {
         _shoppingCart.remove(product);
+      }
+    });
+  }
+
+  void _handleQuantityChanged(Product product, int newQuantity) {
+    setState(() {
+      if (newQuantity <= 0) {
+        // Remove item from list if quantity is 0
+        _products.remove(product);
+        _shoppingCart.remove(product);
+      } else {
+        product.quantity = newQuantity;
       }
     });
   }
@@ -183,6 +253,7 @@ class _ShoppingListState extends State<ShoppingList> {
                   product: product,
                   inCart: _shoppingCart.contains(product),
                   onCartChanged: _handleCartChanged,
+                  onQuantityChanged: _handleQuantityChanged,
                 );
               },
             ),
