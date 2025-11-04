@@ -23518,7 +23518,7 @@ MG:function MG(a){this.a=a},
 a_s(a){var s=0,r=A.L(t.ob),q,p
 var $async$a_s=A.G(function(b,c){if(b===1)return A.I(c,r)
 while(true)switch(s){case 0:p=A.fU("[^a-z0-9]",!0,!1)
-q="https://picsum.photos/seed/"+A.anN(a.toLowerCase(),p,"")+"/400/400"
+q="https://picsum.photos/seed/"+A.anN((a+"-groceries-food").toLowerCase(),p,"")+"/400/400"
 s=1
 break
 case 1:return A.J(q,r)}})
