@@ -187,42 +187,6 @@ class _ShoppingListState extends State<ShoppingList> {
     });
   }
 
-  void _showAddItemDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Add Item'),
-          content: TextField(
-            controller: _textController,
-            autofocus: true,
-            decoration: const InputDecoration(
-              hintText: 'Enter item name',
-              border: OutlineInputBorder(),
-            ),
-            onSubmitted: (value) {
-              _addItem(value);
-              Navigator.pop(context);
-            },
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                _addItem(_textController.text);
-                Navigator.pop(context);
-              },
-              child: const Text('Add'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -240,27 +204,80 @@ class _ShoppingListState extends State<ShoppingList> {
           ),
         ],
       ),
-      body: _products.isEmpty
-          ? const Center(
-              child: Text('No items yet. Tap + to add some!'),
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              itemCount: _products.length,
-              itemBuilder: (context, index) {
-                final product = _products[index];
-                return ShoppingListItem(
-                  product: product,
-                  inCart: _shoppingCart.contains(product),
-                  onCartChanged: _handleCartChanged,
-                  onQuantityChanged: _handleQuantityChanged,
-                );
-              },
+      body: Column(
+        children: [
+          Expanded(
+            child: _products.isEmpty
+                ? const Center(
+                    child: Text('No items yet. Add items below!'),
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    itemCount: _products.length,
+                    itemBuilder: (context, index) {
+                      final product = _products[index];
+                      return ShoppingListItem(
+                        product: product,
+                        inCart: _shoppingCart.contains(product),
+                        onCartChanged: _handleCartChanged,
+                        onQuantityChanged: _handleQuantityChanged,
+                      );
+                    },
+                  ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(16.0),
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              border: Border(
+                top: BorderSide(color: Colors.grey[300]!),
+              ),
             ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showAddItemDialog,
-        tooltip: 'Add Item',
-        child: const Icon(Icons.add),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        'Add to list',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      TextField(
+                        controller: _textController,
+                        decoration: const InputDecoration(
+                          hintText: 'Enter item name',
+                          border: OutlineInputBorder(),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                        ),
+                        onSubmitted: (value) {
+                          _addItem(value);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                FloatingActionButton(
+                  onPressed: () {
+                    _addItem(_textController.text);
+                  },
+                  tooltip: 'Add Item',
+                  child: const Icon(Icons.add),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
