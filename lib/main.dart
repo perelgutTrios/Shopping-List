@@ -1,11 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+// Firebase configuration
+const firebaseConfig = FirebaseOptions(
+  apiKey: "AIzaSyDt-StAE6fQ8BEXI9kQsTZS-7SvGpEWGX0",
+  authDomain: "shopping-list-8fde8.firebaseapp.com",
+  databaseURL: "https://shopping-list-8fde8-default-rtdb.firebaseio.com",
+  projectId: "shopping-list-8fde8",
+  storageBucket: "shopping-list-8fde8.firebasestorage.app",
+  messagingSenderId: "181461429838",
+  appId: "1:181461429838:web:3003e01f47e212eb5d9d1f",
+);
 
 class Product {
-  Product({required this.name, this.quantity = 1});
+  Product({
+    required this.name,
+    this.quantity = 1,
+    this.inCart = false,
+  });
 
   final String name;
   int quantity;
+  bool inCart;
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'quantity': quantity,
+      'inCart': inCart,
+    };
+  }
+
+  factory Product.fromJson(Map<dynamic, dynamic> json) {
+    return Product(
+      name: json['name'] ?? '',
+      quantity: json['quantity'] ?? 1,
+      inCart: json['inCart'] ?? false,
+    );
+  }
 
   @override
   bool operator ==(Object other) =>
@@ -24,13 +61,11 @@ typedef QuantityChangedCallback = void Function(Product product, int quantity);
 class ShoppingListItem extends StatelessWidget {
   ShoppingListItem({
     required this.product,
-    required this.inCart,
     required this.onCartChanged,
     required this.onQuantityChanged,
   }) : super(key: ObjectKey(product));
 
   final Product product;
-  final bool inCart;
   final CartChangedCallback onCartChanged;
   final QuantityChangedCallback onQuantityChanged;
 
@@ -40,13 +75,13 @@ class ShoppingListItem extends StatelessWidget {
     // The BuildContext indicates where the build is
     // taking place and therefore which theme to use.
 
-    return inCart //
+    return product.inCart //
         ? Colors.black54
         : Theme.of(context).primaryColor;
   }
 
   TextStyle? _getTextStyle(BuildContext context) {
-    if (!inCart) return null;
+    if (!product.inCart) return null;
 
     return const TextStyle(
       color: Colors.black54,
@@ -61,14 +96,14 @@ class ShoppingListItem extends StatelessWidget {
 
     return ListTile(
       onTap: () {
-        onCartChanged(product, !inCart);
+        onCartChanged(product, !product.inCart);
       },
       leading: CircleAvatar(
         backgroundColor: _getColor(context),
         child: Text(
           product.name[0],
           style: TextStyle(
-            color: inCart ? Colors.white : Colors.white,
+            color: product.inCart ? Colors.white : Colors.white,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -125,7 +160,7 @@ class ShoppingListItem extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           // Cart checkbox
-          inCart
+          product.inCart
               ? const Icon(Icons.check_circle, color: Colors.green)
               : const Icon(Icons.radio_button_unchecked, color: Colors.grey),
         ],
@@ -158,6 +193,7 @@ class _ShoppingListState extends State<ShoppingList> {
 
   void _handleCartChanged(Product product, bool inCart) {
     setState(() {
+      product.inCart = inCart;
       if (inCart) {
         _shoppingCart.add(product);
       } else {
@@ -224,7 +260,6 @@ class _ShoppingListState extends State<ShoppingList> {
                       final product = _products[index];
                       return ShoppingListItem(
                         product: product,
-                        inCart: _shoppingCart.contains(product),
                         onCartChanged: _handleCartChanged,
                         onQuantityChanged: _handleQuantityChanged,
                       );
