@@ -189,6 +189,12 @@ class _ShoppingListState extends State<ShoppingList> {
 
   @override
   Widget build(BuildContext context) {
+    // Calculate total quantity of items in cart
+    final totalInCart = _shoppingCart.fold<int>(
+      0,
+      (sum, product) => sum + product.quantity,
+    );
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text('Shopping List'),
@@ -197,7 +203,7 @@ class _ShoppingListState extends State<ShoppingList> {
             padding: const EdgeInsets.only(right: 16.0),
             child: Center(
               child: Text(
-                'In Cart: ${_shoppingCart.length}',
+                'In Cart: $totalInCart',
                 style: const TextStyle(fontSize: 16),
               ),
             ),
