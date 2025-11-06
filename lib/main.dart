@@ -8,7 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 // Firebase configuration
 const firebaseConfig = FirebaseOptions(
-  apiKey: "AIzaSyDt-StAE6fQ8BEXI9kQsTZS-7SvGpEWGX0",
+  apiKey: "",
   authDomain: "shopping-list-8fde8.firebaseapp.com",
   databaseURL: "https://shopping-list-8fde8-default-rtdb.firebaseio.com",
   projectId: "shopping-list-8fde8",
