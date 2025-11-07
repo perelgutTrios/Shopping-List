@@ -355,8 +355,7 @@ class _ShoppingListState extends State<ShoppingList> {
   }
 
   Future<void> _initializeFirebase() async {
-    _listRef =
-        FirebaseDatabase.instance.ref('lists/${widget.listId}/products');
+    _listRef = FirebaseDatabase.instance.ref('lists/${widget.listId}/products');
 
     // Listen for changes
     _listRef!.onValue.listen((event) {
@@ -533,9 +532,8 @@ class _ShoppingListState extends State<ShoppingList> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.isShared
-            ? 'Shared Shopping List'
-            : 'Local Shopping List'),
+        title: Text(
+            widget.isShared ? 'Shared Shopping List' : 'Local Shopping List'),
         actions: [
           IconButton(
             icon: const Icon(Icons.share),
