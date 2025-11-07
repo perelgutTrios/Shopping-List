@@ -5,17 +5,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-// Firebase configuration
-const firebaseConfig = FirebaseOptions(
-  apiKey: "",
-  authDomain: "shopping-list-8fde8.firebaseapp.com",
-  databaseURL: "https://shopping-list-8fde8-default-rtdb.firebaseio.com",
-  projectId: "shopping-list-8fde8",
-  storageBucket: "shopping-list-8fde8.firebasestorage.app",
-  messagingSenderId: "181461429838",
-  appId: "1:181461429838:web:3003e01f47e212eb5d9d1f",
-);
+import 'firebase_config.dart';
 
 class Product {
   Product({

@@ -9,3 +9,6 @@ build/
 **/generated_plugin_registrant.dart
 *.iml
 .vscode/
+
+# Firebase configuration - contains sensitive API keys
+lib/firebase_config.dart
